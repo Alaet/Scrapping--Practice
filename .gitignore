@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 P2_oliva_maximilien/test.py
+*.csv
