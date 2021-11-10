@@ -1,28 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 
 def main():
-    url = 'https://books.toscrape.com/catalogue/soumission_998/index.html'
-    #'https://books.toscrape.com/catalogue/soumission_998/index.html'
-    #'https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html'
-    #'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html'
-
+    url = 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html'
     response = requests.get(url)
+
     if response.ok:
         soup = BeautifulSoup(response.content, 'html.parser')
+    else:
+        print("Impossible de joindre la page")
 
-    """Return every products page url on active page 
-    in the form of a list"""
-
-    def get_all_products_url():
-        products_links = []
-        products = soup.findAll('h3')
-        for product in products:
-            a = product.find('a')
-            link = a['href']
-            products_links.append('https://books.toscrape.com/' + link)
-        return products_links
+    # region All functions for each informations
 
     def get_title():
         title = soup.find('h1')
@@ -34,11 +24,11 @@ def main():
 
     def get_price_with_tax():
         prices = soup.findAll('td')
-        return prices[3].string
+        return prices[3].text
 
     def get_price_without_tax():
         prices = soup.findAll('td')
-        return prices[2].string
+        return prices[2].text
 
     def get_stock():
         number_in_stock = soup.findAll('td')
@@ -49,9 +39,8 @@ def main():
         return descriptions[3].string
 
     def get_category():
-        category = soup.find('ul', class_='breadcrumb').find('a', href='../category/books/historical-fiction_4'
-                                                                       '/index.html')
-        return category.string
+        categories = soup.find('ul', class_='breadcrumb').findAll('a')
+        return categories[2].string
 
     def get_rating_review():
         rating = soup.find('div', class_='col-sm-6 product_main').findAll('p')
@@ -60,17 +49,32 @@ def main():
     def get_img_url():
         images = soup.find('div', class_='item active')
         links = []
-        #for image in images:
         a = images.find('img')
         link = a['src']
         links.append('https://books.toscrape.com/' + link)
-        return links
+        return links[0]
 
-    print(get_img_url())
+    # endregion
+
+    csv_title = get_title()
+    en_tete = ["product_page_url", "upc", "title", "price_including_tax", "price_excluding_tax", "number_available",
+               "product_description", "category", "review_rating", "image_url"]
+    with open(csv_title+".csv", 'a+') as fichier_csv:
+        writer = csv.writer(fichier_csv, delimiter=',')
+        writer.writerow(en_tete)
+        title = get_title()
+        image = get_img_url()
+        desc = get_product_description()
+        rating = get_rating_review()
+        category = get_category()
+        stock = get_stock()
+        price_with_tax = str(get_price_with_tax())
+        price_without_tax = str(get_price_without_tax())
+        upc = get_product_upc()
+        url = 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html'
+        ligne = [url, upc, title, price_with_tax, price_without_tax, stock, desc, category, rating, image]
+        writer.writerow(ligne)
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
