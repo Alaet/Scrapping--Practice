@@ -2,16 +2,17 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 from datetime import date
+import time
 
 """URL's category page,    !SET BY USER!  """
-URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/sequential-art_5/"
+URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/travel_2/"
 
 # !! NO INDEX.HTML ON URL VARIABLE !!
 
 
 """Variables that will determine how many page to search,    !SET BY USER!  """
-NUMBER_OF_BOOKS_RESULTS = 75
-NUMBER_OF_BOOKS_SHOWING = 20
+NUMBER_OF_BOOKS_RESULTS = 11
+NUMBER_OF_BOOKS_SHOWING = 0
 
 """Run script when all variables above are set"""
 
@@ -93,27 +94,27 @@ else:
 """Get category from url set by user to determine and set CSV file title"""
 
 soup_title = soup_url(urls_page_category[0])
-title_csv = get_title(soup_title) + " " + date.today().strftime("%b-%d-%Y")
+title_csv = get_title(soup_title) + " " + date.today().strftime("%b-%d-%Y") + ".csv"
 en_tete = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
                     "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
 # endregion
 
 # region CSV file creation, completion
-with open(title_csv+".csv", 'a+', encoding='utf-8', newline='') as fichier_csv:  # Create CSV file
-    urls_reponse = []
+with open(title_csv, 'a+', encoding='utf-8', newline='') as fichier_csv:  # Create CSV file
+    urls_response = []
     urls_book = []
     writer = csv.writer(fichier_csv, delimiter=',')
     writer.writerow(en_tete)
     writer.writerow("")
-
+    print("Création en cour de " + title_csv + " avec : \n\n")
     """Search for NUMBER_OF_PAGE variable (determined by variables NUMBER set by user) from this category,
     index 0 being starting url page category unless there is more than ONE page to search"""
 
     for i in range(j, NUMBER_OF_PAGE):
-        urls_reponse = urls_page_category.append(URL_CATEGORY + "page-" + str(i) + ".html")
-        urls_reponse = requests.get(urls_page_category[i])
-        if urls_reponse.ok:
-            soup = BeautifulSoup(urls_reponse.content, 'html.parser')
+        urls_page_category.append(URL_CATEGORY + "page-" + str(i) + ".html")
+        urls_response = requests.get(urls_page_category[i])
+        if urls_response.ok:
+            soup = BeautifulSoup(urls_response.content, 'html.parser')
             urls_book = get_all_products_url(soup)  # Return all urls book from each page NUMBER_OF_PAGE
             for k in range(0, len(urls_book)):
                 book_url = "https://books.toscrape.com/catalogue/" + urls_book[k]
@@ -132,8 +133,13 @@ with open(title_csv+".csv", 'a+', encoding='utf-8', newline='') as fichier_csv: 
                 """Add every information for each book to urls_book list from book_url"""
                 urls_book[k] = [title, book_url, upc, price_with_tax, price_without_tax, stock, description,
                                 rating_stars, image_url]
+                print(title)
+                time.sleep(1)
             for row in urls_book:
                 writer.writerow(row)
+            print("End of Page " + str(i) + "\n\n")
+            time.sleep(1)
         else:
             pass
+    print(title_csv + " a bien été créer")
 # endregion
