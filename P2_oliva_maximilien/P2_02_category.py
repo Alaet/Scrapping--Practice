@@ -5,16 +5,10 @@ from datetime import date
 import time
 
 """URL's category page,    !SET BY USER!  """
-URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/travel_2/"
+URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/historical-fiction_4/"
 
 # !! NO INDEX.HTML ON URL VARIABLE !!
 
-
-"""Variables that will determine how many page to search,    !SET BY USER!  """
-NUMBER_OF_BOOKS_RESULTS = 11
-NUMBER_OF_BOOKS_SHOWING = 0
-
-"""Run script when all variables above are set"""
 
 # region All functions for each informations
 
@@ -83,17 +77,20 @@ def get_img_url(soup):
 
 
 urls_page_category = [URL_CATEGORY + "index.html"]
-if NUMBER_OF_BOOKS_SHOWING != 0:
+
+"""Get category from url set by user to determine and set CSV file title"""
+
+soup_title = soup_url(urls_page_category[0])
+div_nb = soup_title.find('div', class_='col-sm-8 col-md-9')
+nbs = div_nb.findAll('strong')
+NUMBER_OF_BOOKS_RESULTS = int(nbs[0].string)
+if len(nbs) > 2:
+    NUMBER_OF_BOOKS_SHOWING = int(nbs[2].string)
     NUMBER_OF_PAGE = int((NUMBER_OF_BOOKS_RESULTS/NUMBER_OF_BOOKS_SHOWING) + 2)
     j = 1
 else:
     NUMBER_OF_PAGE = 1
     j = 0
-
-
-"""Get category from url set by user to determine and set CSV file title"""
-
-soup_title = soup_url(urls_page_category[0])
 title_csv = get_title(soup_title) + " " + date.today().strftime("%b-%d-%Y") + ".csv"
 en_tete = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
                     "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
@@ -141,5 +138,5 @@ with open(title_csv, 'a+', encoding='utf-8', newline='') as fichier_csv:  # Crea
             time.sleep(1)
         else:
             pass
-    print(title_csv + " a bien été créer")
+    print(title_csv + " a bien été extrait.")
 # endregion
