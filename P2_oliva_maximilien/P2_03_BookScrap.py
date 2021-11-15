@@ -4,9 +4,8 @@ import csv
 from datetime import date
 import time
 
-"""URL's category page,    !SET BY USER!  """
 
-URL = "https://books.toscrape.com/index.html"
+
 
 # !! NO INDEX.HTML ON URL VARIABLE !!
 
@@ -73,8 +72,7 @@ def get_img_url(soup):
     image_url.append('https://books.toscrape.com/' + link_url)
     return image_url[0]
 # endregion
-
-
+URL = "https://books.toscrape.com/index.html"
 soup = soup_url(URL)
 category_div = soup.find(class_='nav nav-list')
 categories_urls = []
@@ -82,13 +80,16 @@ links_url = category_div.findAll('a')
 for url in links_url:
 
     link = str(url['href'])
-    categories_urls.append("https://books.toscrape.com/" + link)
+    categories_urls.append("https://books.toscrape.com/" + link.replace('index.html', ''))
 
-for i in range(1, len(categories_urls)):
-
+categories_urls.pop(0)
+for url in categories_urls:
+    """URL's category page,    !SET BY USER!  """
+    URL_CATEGORY = url
     # region CSV environment preparation with name: [Category title + DateOfTheDay].csv
-    urls_page_category = [categories_urls[i]]
-    #urls_page_category = [categories_urls[i] + "page-" + str(i) + ".html"]
+
+
+    urls_page_category = [URL_CATEGORY + "index.html"]
 
     """Get category from url set by user to determine and set CSV file title"""
 
@@ -96,10 +97,7 @@ for i in range(1, len(categories_urls)):
     div_nb = soup_title.find('div', class_='col-sm-8 col-md-9')
     nbs = div_nb.findAll('strong')
     NUMBER_OF_BOOKS_RESULTS = int(nbs[0].string)
-    print(NUMBER_OF_BOOKS_RESULTS)
-    print(int(nbs[0].string))
-    print(len(nbs))
-    if len(nbs) >= 2:
+    if len(nbs) > 2:
         NUMBER_OF_BOOKS_SHOWING = int(nbs[2].string)
         NUMBER_OF_PAGE = int((NUMBER_OF_BOOKS_RESULTS/NUMBER_OF_BOOKS_SHOWING) + 2)
         j = 1
@@ -109,7 +107,6 @@ for i in range(1, len(categories_urls)):
     title_csv = get_title(soup_title) + " " + date.today().strftime("%b-%d-%Y") + ".csv"
     en_tete = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
                         "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
-
     # endregion
 
     # region CSV file creation, completion
@@ -124,8 +121,7 @@ for i in range(1, len(categories_urls)):
         index 0 being starting url page category unless there is more than ONE page to search"""
 
         for i in range(j, NUMBER_OF_PAGE):
-            #urls_page_category.append(URL_CATEGORY + "page-" + str(i) + ".html")
-            urls_page_category.append(categories_urls[i].replace('index.html', '') + "page-" + str(i) + ".html")
+            urls_page_category.append(URL_CATEGORY + "page-" + str(i) + ".html")
             urls_response = requests.get(urls_page_category[i])
             if urls_response.ok:
                 soup = BeautifulSoup(urls_response.content, 'html.parser')
