@@ -8,11 +8,15 @@ import os
 
 # region Create directory Book_Images in current script directory
 current_directory = os.getcwd()
-print(current_directory)
+
 book_image_directory = os.path.join(current_directory + '/Book_images/')
-print(book_image_directory)
+
+csv_directory = os.path.join(current_directory + '/Export_csv/')
 if not os.path.exists(book_image_directory):
     os.makedirs(book_image_directory)
+
+if not os.path.exists(csv_directory):
+    os.makedirs(csv_directory)
 # endregion
 
 # region Functions for each information, for any book's url provided
@@ -130,7 +134,9 @@ for url in categories_urls:
                         "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
 
     # region CSV file creation, completion
-    with open(title_csv, 'a+', encoding='utf-8', newline='') as fichier_csv:  # Create CSV file
+    with open(
+            (os.path.join(csv_directory, title_csv)), 'a+', encoding='utf-8', newline='') as fichier_csv:
+        # Create CSV file
         urls_response = []
         urls_book = []
         writer = csv.writer(fichier_csv, delimiter=',')
