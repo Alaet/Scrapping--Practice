@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 P2_oliva_maximilien/test.py
 *.csv
+*.jpg

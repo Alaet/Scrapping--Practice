@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 from datetime import date
 import time
-
+import urllib.request
 
 
 
@@ -143,10 +143,13 @@ for url in categories_urls:
                     """Add every information for each book to urls_book list from book_url"""
                     urls_book[k] = [title, book_url, upc, price_with_tax, price_without_tax, stock, description,
                                     rating_stars, image_url]
+                    urllib.request.urlretrieve(image_url.replace("../../", ''), (title.replace(":", '').replace('.', '')
+                                                                                 .replace('?', '') + '.jpg'))
                     print(title)
                     time.sleep(1)
                 for row in urls_book:
                     writer.writerow(row)
+
                 print("End of Page " + str(i) + "\n\n")
                 time.sleep(1)
             else:
