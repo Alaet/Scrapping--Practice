@@ -30,9 +30,16 @@ def get_all_products_url(given_soup):
     return books_links
 
 
-def get_title(given_soup):
-    given_soup_title = given_soup.find('h1')
-    return given_soup_title.string
+"""Return Image URL from a page book"""
+
+
+def get_img_url(given_soup):
+    image_div = given_soup.find('div', class_='item active')
+    given_soup_image_url = []
+    a = image_div.find('img')
+    link_url = a['src']
+    given_soup_image_url.append('https://books.toscrape.com/' + link_url)
+    return given_soup_image_url[0]
 
 
 """Return list of every <td> elements"""
@@ -51,16 +58,9 @@ def get_paragraphs(given_soup):
     return given_soup_description
 
 
-"""Return Image URL from a page book"""
-
-
-def get_img_url(given_soup):
-    image_div = given_soup.find('div', class_='item active')
-    given_soup_image_url = []
-    a = image_div.find('img')
-    link_url = a['src']
-    given_soup_image_url.append('https://books.toscrape.com/' + link_url)
-    return given_soup_image_url[0]
+def get_title(given_soup):
+    given_soup_title = given_soup.find('h1')
+    return given_soup_title.string
 # endregion
 
 # region Get every categories on main page and return every url as a list : categories_url
