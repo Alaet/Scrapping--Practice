@@ -2,26 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 from datetime import date
-import time
+# import time
 import urllib.request
 import os
 
-# region Create directory Book_Images in current script directory
-current_directory = os.getcwd()
-
-book_image_directory = os.path.join(current_directory + '/Book_images/')
-
-csv_directory = os.path.join(current_directory + '/Export_csv/')
-if not os.path.exists(book_image_directory):
-    os.makedirs(book_image_directory)
-
-if not os.path.exists(csv_directory):
-    os.makedirs(csv_directory)
-# endregion
-
 # region Functions for each information, for any book's url provided
 
-"""Parse any url given and return the result for use"""
+"""Parse any url given and return the result"""
 
 
 def soup_url(given_url):
@@ -43,39 +30,26 @@ def get_all_products_url(given_soup):
     return books_links
 
 
-def get_product_upc(given_soup):
-    given_soup_upc = given_soup.find('td')
-    return given_soup_upc.string
-
-
 def get_title(given_soup):
     given_soup_title = given_soup.find('h1')
     return given_soup_title.string
 
 
-def get_price_with_tax(given_soup):
+"""Return list of every <td> elements"""
+
+
+def get_table_datas(given_soup):
     given_soup_price = given_soup.findAll('td')
-    return given_soup_price[3].text
+    return given_soup_price
 
 
-def get_price_without_tax(given_soup):
-    given_soup_price = given_soup.findAll('td')
-    return given_soup_price[2].text
+"""Return a list of every <p> elements"""
 
 
-def get_stock(given_soup):
-    given_soup_number_in_stock = given_soup.findAll('td')
-    return given_soup_number_in_stock[5].string
-
-
-def get_product_description(given_soup):
+def get_paragraphs(given_soup):
     given_soup_description = given_soup.findAll('p')
-    return given_soup_description[3].string
+    return given_soup_description
 
-
-def get_rating_review(given_soup):
-    given_soup_rating_stars = given_soup.find('div', class_='col-sm-6 product_main').findAll('p')
-    return given_soup_rating_stars[2]['class'][1]
 
 """Return Image URL from a page book"""
 
@@ -89,7 +63,7 @@ def get_img_url(given_soup):
     return given_soup_image_url[0]
 # endregion
 
-# region Get every categories on main page and return every url as a list : categories_url"""
+# region Get every categories on main page and return every url as a list : categories_url
 
 
 URL = "https://books.toscrape.com/index.html"
@@ -104,6 +78,19 @@ for url in links_url:
     categories_urls.append("https://books.toscrape.com/" + link.replace('index.html', ''))
 
 categories_urls.pop(0)
+# endregion
+
+# region Create directory Book_Images and Export_csv in current script directory
+current_directory = os.getcwd()
+
+book_image_directory = os.path.join(current_directory + '/Book_images/')
+
+csv_directory = os.path.join(current_directory + '/Export_csv/')
+if not os.path.exists(book_image_directory):
+    os.makedirs(book_image_directory)
+
+if not os.path.exists(csv_directory):
+    os.makedirs(csv_directory)
 # endregion
 
 # region CSV environment preparation with name: [Category title + DateOfTheDay].csv
@@ -155,15 +142,17 @@ for url in categories_urls:
                 for k in range(0, len(urls_book)):
                     book_url = "https://books.toscrape.com/catalogue/" + urls_book[k]
                     soup = soup_url(book_url)
+                    book_table_datas = get_table_datas(soup)
+                    page_paragraphs = get_paragraphs(soup)
 
                     """Get every informations from each book"""
-                    upc = get_product_upc(soup)
+                    upc = book_table_datas[0].string
                     title = get_title(soup)
-                    price_with_tax = get_price_with_tax(soup)
-                    price_without_tax = get_price_without_tax(soup)
-                    stock = get_stock(soup)
-                    description = get_product_description(soup)
-                    rating_stars = get_rating_review(soup)
+                    price_with_tax = book_table_datas[3].text
+                    price_without_tax = book_table_datas[2].text
+                    stock = book_table_datas[5].string
+                    description = page_paragraphs[3].string
+                    rating_stars = page_paragraphs[2]['class'][1]
                     image_url = get_img_url(soup)
 
                     """Add every information for each book to urls_book list from book_url"""
@@ -180,12 +169,12 @@ for url in categories_urls:
                                                                                               .replace('*', '')
                                                                                               + '.jpg')))
                     print(title)
-                    time.sleep(1)
+                    # time.sleep(1)
                 for row in urls_book:
                     writer.writerow(row)
 
                 print("End of Page " + str(i) + "\n\n")
-                time.sleep(1)
+                # time.sleep(1)
             else:
                 pass
         print(title_csv + " a bien été extrait.")
