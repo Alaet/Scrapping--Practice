@@ -117,8 +117,8 @@ for url in categories_urls:
 
     """Set CSV title based on current category"""
     title_csv = get_title(soup_category_url) + " " + date.today().strftime("%b-%d-%Y") + ".csv"
-    en_tete = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
-                        "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
+    header = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
+              "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
 
     # region CSV file creation, completion
     with open(
@@ -127,7 +127,7 @@ for url in categories_urls:
         urls_response = []
         urls_book = []
         writer = csv.writer(fichier_csv, delimiter=',')
-        writer.writerow(en_tete)
+        writer.writerow(header)
         writer.writerow("")
         print("Création en cour de " + title_csv + " avec : \n\n")
         """Search for NUMBER_OF_PAGE variable (determined by variables NUMBER set by user) from this category,
@@ -139,9 +139,10 @@ for url in categories_urls:
             if urls_response.ok:
                 soup = BeautifulSoup(urls_response.content, 'html.parser')
                 urls_book = get_all_products_url(soup)  # Return all urls book from each page NUMBER_OF_PAGE
-                for k in range(0, len(urls_book)):
-                    book_url = "https://books.toscrape.com/catalogue/" + urls_book[k]
+                for index, url_book in enumerate(urls_book):
+                    book_url = "https://books.toscrape.com/catalogue/" + url_book
                     soup = soup_url(book_url)
+
                     book_table_datas = get_table_datas(soup)
                     page_paragraphs = get_paragraphs(soup)
 
@@ -156,8 +157,8 @@ for url in categories_urls:
                     image_url = get_img_url(soup)
 
                     """Add every information for each book to urls_book list from book_url"""
-                    urls_book[k] = [title, book_url, upc, price_with_tax, price_without_tax, stock, description,
-                                    rating_stars, image_url]
+                    urls_book[index] = [title, book_url, upc, price_with_tax, price_without_tax, stock, description,
+                                        rating_stars, image_url]
 
                     """Save image from url"""
                     urllib.request.urlretrieve(image_url.replace("../../", ''), os.path.join(book_image_directory,
