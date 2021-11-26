@@ -92,8 +92,8 @@ else:
     NUMBER_OF_PAGE = 1
     j = 0
 title_csv = get_title(soup_title) + " " + date.today().strftime("%b-%d-%Y") + ".csv"
-en_tete = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
-                    "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
+header = ["TITRE", "PRODUCT_PAGE_URL", "UPC", "PRICE_INCLUDING_TAX", "PRICE_EXCLUDING_TAX", "NUMBER_AVAILABLE",
+          "PRODUCT_DESCRIPTION", "REVIEW_RATING", "IMAGE_URL"]
 # endregion
 
 # region CSV file creation, completion
@@ -101,11 +101,9 @@ with open(title_csv, 'a+', encoding='utf-8', newline='') as fichier_csv:  # Crea
     urls_response = []
     urls_book = []
     writer = csv.writer(fichier_csv, delimiter=',')
-    writer.writerow(en_tete)
+    writer.writerow(header)
     writer.writerow("")
     print("Création en cour de " + title_csv + " avec : \n\n")
-    """Search for NUMBER_OF_PAGE variable (determined by variables NUMBER set by user) from this category,
-    index 0 being starting url page category unless there is more than ONE page to search"""
 
     for i in range(j, NUMBER_OF_PAGE):
         urls_page_category.append(URL_CATEGORY + "page-" + str(i) + ".html")
@@ -117,7 +115,7 @@ with open(title_csv, 'a+', encoding='utf-8', newline='') as fichier_csv:  # Crea
                 book_url = "https://books.toscrape.com/catalogue/" + urls_book[k]
                 soup = soup_url(book_url)
 
-                """Get every informations from each book"""
+                """Get every information from each book"""
                 upc = get_product_upc(soup)
                 title = get_title(soup)
                 price_with_tax = get_price_with_tax(soup)
