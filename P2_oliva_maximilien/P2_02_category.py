@@ -5,7 +5,7 @@ from datetime import date
 import time
 
 """URL's category page,    !SET BY USER!  """
-URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/historical-fiction_4/"
+URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/sequential-art_5/"
 
 # !! NO "INDEX.HTML" ON URL_CATEGORY VARIABLE !!
 
@@ -81,11 +81,11 @@ urls_page_category = [URL_CATEGORY + "index.html"]
 """Get category from url set by user to determine and set CSV file title"""
 
 soup_title = soup_url(urls_page_category[0])
-div_nb = soup_title.find('div', class_='col-sm-8 col-md-9')
-nbs = div_nb.findAll('strong')
-NUMBER_OF_BOOKS_RESULTS = int(nbs[0].string)
-if len(nbs) > 2:
-    NUMBER_OF_BOOKS_SHOWING = int(nbs[2].string)
+div = soup_title.find('div', class_='col-sm-8 col-md-9')
+strong_tags = div.findAll('strong')
+NUMBER_OF_BOOKS_RESULTS = int(strong_tags[0].string)
+if len(strong_tags) > 2:
+    NUMBER_OF_BOOKS_SHOWING = int(strong_tags[2].string)
     NUMBER_OF_PAGE = int((NUMBER_OF_BOOKS_RESULTS/NUMBER_OF_BOOKS_SHOWING) + 2)
     j = 1
 else:

@@ -23,8 +23,8 @@ def soup_url(given_url):
 def get_all_products_url(given_soup):
     books_links = []
     books_url = given_soup.findAll('h3')
-    for url in books_url:
-        a = url.find('a')
+    for BOOK_URL in books_url:
+        a = BOOK_URL.find('a')
         link_url = a['href']
         books_links.append(("https://books.toscrape.com/" + link_url))
     return books_links
@@ -104,11 +104,11 @@ for url in categories_urls:
 
     """Determine numbers of books in category to fix number of pages to search"""
     soup_category_url = soup_url(urls_page_category[0])
-    div_nb = soup_category_url.find('div', class_='col-sm-8 col-md-9')
-    nbs = div_nb.findAll('strong')
-    NUMBER_OF_BOOKS_RESULTS = int(nbs[0].string)
-    if len(nbs) > 2:
-        NUMBER_OF_BOOKS_SHOWING = int(nbs[2].string)
+    div = soup_category_url.find('div', class_='col-sm-8 col-md-9')
+    strong_tags = div.findAll('strong')
+    NUMBER_OF_BOOKS_RESULTS = int(strong_tags[0].string)
+    if len(strong_tags) > 2:
+        NUMBER_OF_BOOKS_SHOWING = int(strong_tags[2].string)
         NUMBER_OF_PAGE = int((NUMBER_OF_BOOKS_RESULTS/NUMBER_OF_BOOKS_SHOWING) + 2)
         j = 1
     else:
@@ -136,20 +136,20 @@ for url in categories_urls:
             urls_response = requests.get(urls_page_category[i])
             if urls_response.ok:
                 soup = BeautifulSoup(urls_response.content, 'html.parser')
-                urls_book = get_all_products_url(soup)  # Return all urls book from each page NUMBER_OF_PAGE
+                urls_book = get_all_products_url(soup)  # Return every url book from each page for NUMBER_OF_PAGE
                 for index, url_book in enumerate(urls_book):
                     book_url = "https://books.toscrape.com/catalogue/" + url_book
                     soup = soup_url(book_url)
 
-                    book_table_datas = get_table_data(soup)
+                    book_table_data = get_table_data(soup)
                     page_paragraphs = get_paragraphs(soup)
 
                     """Get every information from each book"""
-                    upc = book_table_datas[0].string
+                    upc = book_table_data[0].string
                     title = get_title(soup)
-                    price_with_tax = book_table_datas[3].text
-                    price_without_tax = book_table_datas[2].text
-                    stock = book_table_datas[5].string
+                    price_with_tax = book_table_data[3].text
+                    price_without_tax = book_table_data[2].text
+                    stock = book_table_data[5].string
                     description = page_paragraphs[3].string
                     rating_stars = page_paragraphs[2]['class'][1]
                     image_url = get_img_url(soup)
