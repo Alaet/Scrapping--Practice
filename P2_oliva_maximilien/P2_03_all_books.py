@@ -23,8 +23,8 @@ def soup_url(given_url):
 def get_all_products_url(given_soup):
     books_links = []
     books_url = given_soup.findAll('h3')
-    for url_book in books_url:
-        a = url_book.find('a')
+    for url in books_url:
+        a = url.find('a')
         link_url = a['href']
         books_links.append(("https://books.toscrape.com/" + link_url))
     return books_links
@@ -45,7 +45,7 @@ def get_img_url(given_soup):
 """Return list of every <td> elements"""
 
 
-def get_table_datas(given_soup):
+def get_table_data(given_soup):
     given_soup_price = given_soup.findAll('td')
     return given_soup_price
 
@@ -130,8 +130,6 @@ for url in categories_urls:
         writer.writerow(header)
         writer.writerow("")
         print("Création en cour de " + title_csv + " avec : \n\n")
-        """Search for NUMBER_OF_PAGE variable (determined by variables NUMBER set by user) from this category,
-        index 0 being starting url page category unless there is more than ONE page to search"""
 
         for i in range(j, NUMBER_OF_PAGE):
             urls_page_category.append(URL_CATEGORY + "page-" + str(i) + ".html")
@@ -143,10 +141,10 @@ for url in categories_urls:
                     book_url = "https://books.toscrape.com/catalogue/" + url_book
                     soup = soup_url(book_url)
 
-                    book_table_datas = get_table_datas(soup)
+                    book_table_datas = get_table_data(soup)
                     page_paragraphs = get_paragraphs(soup)
 
-                    """Get every informations from each book"""
+                    """Get every information from each book"""
                     upc = book_table_datas[0].string
                     title = get_title(soup)
                     price_with_tax = book_table_datas[3].text

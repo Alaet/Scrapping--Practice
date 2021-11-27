@@ -14,7 +14,7 @@ else:
     print("Impossible de joindre la page, vérifier l'URL")
 
 
-# region All functions for each informations
+# region All functions for each information
 
 def get_title():
     title = soup.find('h1')
@@ -87,7 +87,7 @@ with open(csv_title + ".csv", 'a+', encoding='utf-8') as fichier_csv:
     price_with_tax = str(get_price_with_tax())
     price_without_tax = str(get_price_without_tax())
     upc = get_product_upc()
-    #url = 'https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html'
+
     csv_line = [url, upc, title, price_with_tax, price_without_tax, stock, desc, category, rating, image]
     writer.writerow(csv_line)
 # endregion

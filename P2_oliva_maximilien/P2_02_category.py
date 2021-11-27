@@ -7,15 +7,15 @@ import time
 """URL's category page,    !SET BY USER!  """
 URL_CATEGORY = "https://books.toscrape.com/catalogue/category/books/historical-fiction_4/"
 
-# !! NO INDEX.HTML ON URL VARIABLE !!
+# !! NO "INDEX.HTML" ON URL_CATEGORY VARIABLE !!
 
 
-# region All functions for each informations
+# region All functions for each information
 
 
 def soup_url(url):
-    url_reponse = requests.get(url)
-    soup = BeautifulSoup(url_reponse.content, 'html.parser')
+    url_response = requests.get(url)
+    soup = BeautifulSoup(url_response.content, 'html.parser')
     return soup
 
 
